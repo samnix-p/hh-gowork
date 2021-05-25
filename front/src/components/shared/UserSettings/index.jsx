@@ -1,5 +1,7 @@
 import React, { useState, useRef } from 'react';
+
 import { IconButton, Popper, Paper, Avatar, Button, Box, ClickAwayListener } from '@material-ui/core';
+
 import PersonIcon from '@material-ui/icons/Person';
 
 import Api from 'src/api';

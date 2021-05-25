@@ -13,10 +13,10 @@ function CourseHomepage() {
         <React.Fragment>
             <Header UserSettings={UserSettings} />
             <Container>
-                <Grid container justify="space-between">
+                <Grid container justify="space-around">
                     <Golearn />
                 </Grid>
-                <Menu container justify="space-between" />
+                <Menu container justify="space-around" />
             </Container>
         </React.Fragment>
     );
