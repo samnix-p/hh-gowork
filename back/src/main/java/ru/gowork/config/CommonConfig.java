@@ -1,25 +1,28 @@
 package ru.gowork.config;
 
-import ru.gowork.mapper.ChapterMapper;
-import ru.gowork.resource.ChapterResource;
-import ru.gowork.dao.ChapterDao;
-import ru.gowork.dao.UserDao;
-import ru.gowork.resource.StudentResource;
-import ru.gowork.resource.ParagraphResource;
-import ru.gowork.resource.AuthResource;
-import ru.gowork.dao.StudentsDao;
-import ru.gowork.dao.ParagraphDao;
-import ru.gowork.mapper.StudentMapper;
-import ru.gowork.service.ChapterService;
-import ru.gowork.service.StudentsService;
-import ru.gowork.service.ParagraphService;
-import ru.gowork.service.AuthService;
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import ru.gowork.dao.ChapterDao;
+import ru.gowork.dao.ParagraphDao;
+import ru.gowork.dao.StudentsDao;
+import ru.gowork.dao.UserDao;
+import ru.gowork.mapper.ChapterMapper;
+import ru.gowork.mapper.StudentMapper;
+import ru.gowork.resource.AuthResource;
+import ru.gowork.resource.ChapterResource;
+import ru.gowork.resource.ParagraphResource;
+import ru.gowork.resource.StudentResource;
+import ru.gowork.service.AuthService;
+import ru.gowork.service.ChapterService;
+import ru.gowork.service.ParagraphService;
+import ru.gowork.service.StudentsService;
+import ru.hh.nab.common.properties.FileSettings;
+import ru.hh.nab.datasource.DataSourceFactory;
 import ru.hh.nab.hibernate.MappingConfig;
 import ru.hh.nab.starter.NabCommonConfig;
+
+import javax.sql.DataSource;
 
 
 @Configuration
@@ -47,5 +50,10 @@ public class CommonConfig {
         MappingConfig mappingConfig = new MappingConfig();
         mappingConfig.addPackagesToScan("ru.gowork.entity");
         return mappingConfig;
+    }
+
+    @Bean
+    public DataSource dataSource(DataSourceFactory dataSourceFactory, FileSettings fileSettings) {
+        return dataSourceFactory.create("master", false, fileSettings);
     }
 }

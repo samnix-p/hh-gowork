@@ -2,52 +2,63 @@ package ru.gowork;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
+import org.junit.After;
 import org.junit.Before;
+import ru.hh.nab.hibernate.transaction.TransactionalScope;
 import ru.hh.nab.starter.NabApplication;
 import ru.hh.nab.testbase.NabTestBase;
 
 import javax.inject.Inject;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 
 public abstract class BaseTest extends NabTestBase {
 
-  protected static final String MIGRATIONS_PATH = "migrations";
-  protected static final String[] DB_CREATE_FILES = new String[] {
-      "001.sql",
-      "002-steps-paragraphs.sql",
-      "003-users-and-answer.sql"
+  private static final String MIGRATIONS_FOLDER = "migrations";
+
+  private static final Path[] DB_CREATE_FILES = new Path[] {
+      Paths.get(MIGRATIONS_FOLDER, "001.sql"),
+      Paths.get(MIGRATIONS_FOLDER, "002-steps-paragraphs.sql"),
+      Paths.get(MIGRATIONS_FOLDER, "003-users-and-answer.sql")
   };
-  protected static final String UNIT_TESTS_SCRIPTS_PATH = "src/test/resources/scripts";
 
   private static boolean initialized = false;
 
   @Inject
   private SessionFactory sessionFactory;
 
+  @Inject
+  private TransactionalScope transactionalScope;
+
   @Before
-  public void initDb() throws IOException {
+  public void initDb() {
     if (!initialized) {
-      Session session = sessionFactory.openSession();
-      Transaction transaction = session.getTransaction();
-      transaction.begin();
-      try {
-        for (String file : DB_CREATE_FILES) {
-          String queries = Files.readString(Paths.get(MIGRATIONS_PATH, file));
-          Arrays.stream(queries.split(";")).forEach(query -> session.createNativeQuery(query).executeUpdate());
+      transactionalScope.write(() -> {
+        Session session = sessionFactory.getCurrentSession();
+        try {
+          for (Path file : DB_CREATE_FILES) {
+            String queries = Files.readString(file);
+            Arrays.stream(queries.split(";"))
+                .forEach(query -> session.createNativeQuery(query).executeUpdate());
+          }
+        } catch (IOException e) {
+          throw new RuntimeException(e.getMessage());
         }
-      } catch (IOException e) {
-        e.printStackTrace();
-        throw new IOException();
-      } finally {
-        transaction.commit();
-        session.close();
-      }
+      });
       initialized = true;
     }
+  }
+
+  @After
+  public void clearDb() {
+    transactionalScope.write(() -> {
+      Session session = sessionFactory.getCurrentSession();
+      session.createNativeQuery("DELETE FROM paragraphs").executeUpdate();
+      session.createNativeQuery("DELETE FROM chapters").executeUpdate();
+    });
   }
 
   @Override
