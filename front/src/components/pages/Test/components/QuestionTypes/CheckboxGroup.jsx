@@ -1,5 +1,11 @@
 import React, { useState } from 'react';
-import { FormControl, FormGroup, FormControlLabel, Checkbox, Button, Box } from '@material-ui/core';
+
+import Box from '@material-ui/core/Box';
+import Button from '@material-ui/core/Button';
+import Checkbox from '@material-ui/core/Checkbox';
+import FormControl from '@material-ui/core/FormControl';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import FormGroup from '@material-ui/core/FormGroup';
 
 const CheckboxGroup = (props) => {
     const data = props.data.question.answers.reduce((data, cur) => ({ ...data, [cur.id]: false }), {});
