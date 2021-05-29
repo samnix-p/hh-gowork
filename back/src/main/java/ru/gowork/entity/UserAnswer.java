@@ -19,6 +19,12 @@ public class UserAnswer {
     public UserAnswer() {
     }
 
+    public UserAnswer(User user, Step step, Object answer) {
+        this.user = user;
+        this.step = step;
+        this.answer = answer;
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")

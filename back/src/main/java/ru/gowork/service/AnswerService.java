@@ -19,15 +19,16 @@ public class AnswerService {
         this.userDao = userDao;
     }
 
-    public Object saveAnswerGetExplanation(String session, String answer) {
+    public Optional<Object> saveAnswerGetExplanation(String session, String answer) {
         Optional<User> userOptional = userDao.getUserBySessionId(session);
-        User user = userOptional.get();
-        Step step = user.getCurrentStep();
-        UserAnswer userAnswer = new UserAnswer();
-        userAnswer.setUser(user);
-        userAnswer.setStep(step);
-        userAnswer.setAnswer(answer);
-        userAnswerDao.saveAnswer(userAnswer);
-        return step.getAnswersExplanations();
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
+            Step step = user.getCurrentStep();
+            UserAnswer userAnswer = new UserAnswer(user, step, answer);
+            userAnswerDao.saveAnswer(userAnswer);
+            return Optional.of(step.getAnswersExplanations());
+        }
+        return Optional.empty();
     }
+
 }
