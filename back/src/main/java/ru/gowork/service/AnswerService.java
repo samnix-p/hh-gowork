@@ -19,8 +19,8 @@ public class AnswerService {
         this.userDao = userDao;
     }
 
-    public Optional<Object> saveAnswerGetExplanation(String session, String answer) {
-        Optional<User> userOptional = userDao.getUserBySessionId(session);
+    public Optional<Object> saveAnswerGetExplanation(String userEmail, String answer) {
+        Optional<User> userOptional = userDao.getUserByEmail(userEmail);
         if (userOptional.isPresent()) {
             User user = userOptional.get();
             Step step = user.getCurrentStep();
