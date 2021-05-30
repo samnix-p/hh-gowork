@@ -18,18 +18,6 @@ public class AnswerService {
         this.userDao = userDao;
     }
 
-//    public Optional<Object> saveAnswerGetExplanation(String userEmail, String answer) {
-//        Optional<User> userOptional = userDao.getUserByEmail(userEmail);
-//        if (userOptional.isPresent()) {
-//            User user = userOptional.get();
-//            Step step = user.getCurrentStep();
-//            UserAnswer userAnswer = new UserAnswer(user, step, answer);
-//            userAnswerDao.saveAnswer(userAnswer);
-//            return Optional.of(step.getAnswersExplanations());
-//        }
-//        return Optional.empty();
-
-
     public Optional<Object> saveAnswerGetExplanation(String userEmail, String answer) {
         Optional<User> userOpt = userDao.getUserByEmail(userEmail);
         userOpt.ifPresent(user -> userAnswerDao.saveAnswer(new UserAnswer(user, user.getCurrentStep(), answer)));
