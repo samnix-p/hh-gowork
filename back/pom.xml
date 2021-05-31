@@ -4,18 +4,16 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>ru.gowork</groupId>
     <artifactId>back</artifactId>
-    <version>1.0-SNAPSHOT</version>
 
     <packaging>jar</packaging>
 
     <parent>
-        <groupId>ru.hh.public-pom</groupId>
-        <artifactId>public-pom</artifactId>
-        <version>1.37</version>
+        <groupId>ru.hh.nab</groupId>
+        <artifactId>nuts-and-bolts-parent</artifactId>
+        <version>4.30.2</version>
     </parent>
 
     <properties>
-        <nab.version>4.22.20</nab.version>
         <org.springframework.security.version>5.4.6</org.springframework.security.version>
     </properties>
 
@@ -23,7 +21,7 @@
         <repository>
             <id>hh-public</id>
             <name>hh public releases repository</name>
-            <url>http://m2.hh.ru/content/repositories/public-releases</url>
+            <url>https://m2.hh.ru/content/repositories/public-releases</url>
             <releases>
                 <enabled>true</enabled>
             </releases>
@@ -37,18 +35,18 @@
         <dependency>
             <groupId>ru.hh.nab</groupId>
             <artifactId>nab-starter</artifactId>
-            <version>${nab.version}</version>
+            <version>${project.version}</version>
         </dependency>
 
         <dependency>
             <groupId>ru.hh.nab</groupId>
             <artifactId>nab-hibernate</artifactId>
-            <version>${nab.version}</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>ru.hh.nab</groupId>
             <artifactId>nab-testbase</artifactId>
-            <version>${nab.version}</version>
+            <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
