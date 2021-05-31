@@ -1,28 +1,32 @@
 package ru.gowork;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.hibernate.SessionFactory;
+import org.hibernate.Session;
+import org.junit.After;
 import org.junit.Test;
 import org.springframework.test.context.ContextConfiguration;
-import ru.hh.nab.hibernate.transaction.TransactionalScope;
+import ru.gowork.dto.ChapterDto;
+import ru.gowork.dto.ShortParagraphDto;
 
-import javax.inject.Inject;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.Response;
-import java.util.HashSet;
+import java.util.List;
 
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 
 @ContextConfiguration(classes = TestConfig.class)
 public class ChapterResourceTest extends BaseTest {
 
-  @Inject
-  private SessionFactory sessionFactory;
-
-  @Inject
-  private TransactionalScope transactionalScope;
+  @After
+  public void clearDb() {
+    transactionalScope.write(() -> {
+      Session session = sessionFactory.getCurrentSession();
+      session.createNativeQuery("DELETE FROM paragraphs").executeUpdate();
+      session.createNativeQuery("DELETE FROM chapters").executeUpdate();
+    });
+  }
 
   @Test
   public void checkContentStatus() {
@@ -50,16 +54,30 @@ public class ChapterResourceTest extends BaseTest {
           .executeUpdate();
     });
 
-    Response response = executeGet("/content");
-    HashSet<Object> dataFromDB = response.readEntity(new GenericType<HashSet<Object>>(){});
-    HashSet<Object> expectedValue = new ObjectMapper()
-        .readValue("" +
-            "[{\"id\":1,\"name\":\"chapter 1\",\"paragraphs\":" +
-            "[{\"id\":1,\"name\":\"par 1\"},{\"id\":2,\"name\":\"par 2\"}]}," +
-            "{\"id\":2,\"name\":\"chapter 2\",\"paragraphs\":" +
-            "[{\"id\":3,\"name\":\"par 1\"}]}]",
-            new TypeReference<HashSet<Object>>() {});
+    ShortParagraphDto shortParagraphDto1 = new ShortParagraphDto();
+    shortParagraphDto1.setId(1);
+    shortParagraphDto1.setName("par 1");
+    ShortParagraphDto shortParagraphDto2 = new ShortParagraphDto();
+    shortParagraphDto2.setId(2);
+    shortParagraphDto2.setName("par 2");
 
-    assertEquals(expectedValue, dataFromDB);
+    ChapterDto chapterDto1 = new ChapterDto();
+    chapterDto1.setId(1);
+    chapterDto1.setName("chapter 1");
+    chapterDto1.setParagraphs(List.of(shortParagraphDto1, shortParagraphDto2));
+
+    ShortParagraphDto shortParagraphDto3 = new ShortParagraphDto();
+    shortParagraphDto3.setId(3);
+    shortParagraphDto3.setName("par 1");
+
+    ChapterDto chapterDto2 = new ChapterDto();
+    chapterDto2.setId(2);
+    chapterDto2.setName("chapter 2");
+    chapterDto2.setParagraphs(List.of(shortParagraphDto3));
+
+    Response response = executeGet("/content");
+    List<ChapterDto> dataFromDB = response.readEntity(new GenericType<List<ChapterDto>>(){});
+
+    assertThat(dataFromDB, containsInAnyOrder(chapterDto2, chapterDto1));
   }
 }
